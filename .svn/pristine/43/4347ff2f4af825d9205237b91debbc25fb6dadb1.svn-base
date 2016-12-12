@@ -1,0 +1,373 @@
+<?php
+
+namespace backend\controllers;
+
+use Yii;
+use common\models\PesanPinjam;
+use backend\models\Pinjam;
+use backend\models\Kembali;
+use common\models\PesanPinjamSearch;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
+use common\models\Pengguna;
+use yii\data\ActiveDataProvider;
+use common\models\Pemesanan;
+use common\models\PemesananSearch;
+use common\models\DetailBuku;
+use common\models\DetailKaset;
+use common\models\Peminjaman;
+
+/**
+ * PesanPinjamController implements the CRUD actions for PesanPinjam model.
+ */
+class PesanPinjamController extends Controller {
+
+    public function behaviors() {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Lists all PesanPinjam models.
+     * @return mixed
+     */
+    // public function actionIndex()
+    // {
+    //     $searchModel = new PesanPinjamSearch();
+    //     $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    //     return $this->render('index', [
+    //         'searchModel' => $searchModel,
+    //         'dataProvider' => $dataProvider,
+    //     ]);
+    // }
+
+    public function actionIndex() {
+        $id = Yii::$app->user->id;
+        $pengguna = Pengguna::findOne(['id' => $id]);
+        $searchModel = new PesanPinjamSearch();
+        $dataProvider = new ActiveDataProvider([
+            'query' => PesanPinjam::find()->where(['id_pengguna' => $id])->andWhere('id_jenis != 12'),
+        ]);
+
+        return $this->render('index', [
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionPemesanan() {
+        $model = new Pemesanan();
+        $querypermohonanbuku = Pemesanan::find()->where(['id_status' => 3])->andWhere(['id_referensi_kategori' => 1]);
+        $permohonanbuku = new ActiveDataProvider(
+                [
+            'query' => $querypermohonanbuku,
+        ]);
+
+        $querypermohonankaset = Pemesanan::find()->where(['id_status' => 3])->andWhere(['id_referensi_kategori' => 2]);
+        $permohonankaset = new ActiveDataProvider(
+                [
+            'query' => $querypermohonankaset,
+        ]);
+
+        $queryterimabuku = Pemesanan::find()->where(['id_status' => 4])->andWhere(['id_referensi_kategori' => 1]);
+        $terimabuku = new ActiveDataProvider(
+                [
+            'query' => $queryterimabuku,
+        ]);
+
+        $queryterimakaset = Pemesanan::find()->where(['id_status' => 4])->andWhere(['id_referensi_kategori' => 2]);
+        $terimakaset = new ActiveDataProvider(
+                [
+            'query' => $queryterimakaset,
+        ]);
+
+        return $this->render('pemesanan', [
+                    'permohonanbuku' => $permohonanbuku,
+                    'permohonankaset' => $permohonankaset,
+                    'terimabuku' => $terimabuku,
+                    'terimakaset' => $terimakaset,
+                    'model' => $model,
+        ]);
+    }
+
+    public function actionApprove($id) {
+        $time = date("Y-m-d H:m:d");
+        $loan_borrower = Pemesanan::find()->where(['id' => $id])->one();
+        $loan_borrower->tgl_pemeritahuan = $time;
+//        $loan_borrower->due_date = date("Y-m-d", strtotime($time . '+7 days'));
+        $loan_borrower->id_status = 4;
+        $loan_borrower->acc1 = Yii::$app->user->id;
+        $loan_borrower->save();
+        if ($loan_borrower->id_referensi_kategori == 1) {
+            $book_copy = DetailBuku::find()->where(['id_buku' => $loan_borrower->id_d_buku])->one();
+//            $book_copy->availability = 0;
+            $book_copy->save();
+        } else {
+            $kaset_copy = DetailKaset::find()->where(['id_kaset' => $loan_borrower->id_d_kaset])->one();
+//            $kaset_copy->availability = 0;
+            $kaset_copy->save();
+        }
+        $this->redirect(['pemesanan']);
+    }
+
+    public function actionReject($id) {
+        $time = date("Y-m-d H:m:d");
+        $loan_borrower = Pemesanan::find()->where(['id' => $id])->one();
+        $loan_borrower->tgl_pemeritahuan = $time;
+//        $loan_borrower->due_date = date("Y-m-d", strtotime($time . '+7 days'));
+        $loan_borrower->id_status = 5;
+        $loan_borrower->acc1 = Yii::$app->user->id;
+        $loan_borrower->save();
+        if ($loan_borrower->id_referensi_kategori == 1) {
+            $book_copy = DetailBuku::find()->where(['id_buku' => $loan_borrower->id_d_buku])->one();
+            $book_copy->availability = 1;
+            $book_copy->save();
+        } else {
+            $kaset_copy = DetailKaset::find()->where(['id_kaset' => $loan_borrower->id_d_kaset])->one();
+            $kaset_copy->availability = 1;
+            $kaset_copy->save();
+        }
+        $this->redirect(['pemesanan']);
+    }
+
+    public function actionReturn($id) {
+        $time = date("Y-m-d H:m:d");
+        $loan_borrower = Pemesanan::find()->where(['id' => $id])->one();
+        $loan_borrower->tgl_ganti_status = $time;
+//        $loan_borrower->due_date = date("Y-m-d", strtotime($time . '+7 days'));
+        $loan_borrower->id_status = 5;
+        $loan_borrower->acc2 = Yii::$app->user->id;
+        $loan_borrower->save();
+        if ($loan_borrower->id_referensi_kategori == 1) {
+            $book_copy = DetailBuku::find()->where(['id_buku' => $loan_borrower->id_d_buku])->one();
+            $book_copy->availability = 1;
+            $book_copy->save();
+        } else {
+            $kaset_copy = DetailKaset::find()->where(['id_kaset' => $loan_borrower->id_d_kaset])->one();
+            $kaset_copy->availability = 1;
+            $kaset_copy->save();
+        }
+        $this->redirect(['pemesanan']);
+    }
+
+    public function actionCancel($id, $id_jenis) {
+
+        $model = $this->findModel($id);
+        $model->id_jenis = 12;
+
+        $pemesanan = \common\models\Pemesanan::findOne(['id' => $model->tDPemesanans->id]);
+
+        $test = 10;
+        $test2 = 9;
+
+        if ($id_jenis == $test) {
+            $disk = \common\models\DetailKaset::find()->where(['id_kaset' => $pemesanan->id_d_kaset])->one();
+            $disk->availability = 1;
+            $disk->save();
+        } else if ($id_jenis == $test2) {
+            $book = \common\models\DetailBuku::find()->where(['id_buku' => $pemesanan->id_d_buku])->one();
+            $book->availability = 1;
+            $book->save();
+        }
+
+        if ($model->save() && $pemesanan->save()) {
+            return $this->redirect(['index', 'status' => 'cancel']);
+        }
+    }
+
+    /**
+     * Displays a single PesanPinjam model.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionView($id) {
+        return $this->render('view', [
+                    'model' => $this->findModel($id),
+        ]);
+    }
+
+    /**
+     * Creates a new PesanPinjam model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate() {
+        $model = new PesanPinjam();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('create', [
+                        'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Updates an existing PesanPinjam model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUpdate($id) {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('update', [
+                        'model' => $model,
+            ]);
+        }
+    }
+
+    public function actionPinjam() {
+        $model = new Pinjam();
+
+        if ($model->load(Yii::$app->request->post()) && $model->Peminjaman()) {
+            Yii::$app->session->setFlash('success', 'Peminjaman Bahan Pustaka Berhasil!');
+            return $this->redirect(['pinjam']);
+        } else {
+            return $this->render('pinjam', [
+                        'model' => $model,
+            ]);
+        }
+    }
+
+    public function actionKembali() {
+        $model = new Kembali();
+        if ($model->load(Yii::$app->request->post())) {
+            $peminjamanBuku = \common\models\Peminjaman::find()->where(['id_d_buku' => $model->id_bahan_pustaka]);
+            $peminjamanKaset = \common\models\Peminjaman::find()->where(['id_d_kaset' => $model->id_bahan_pustaka]);
+            $Peminjam = null;
+            if ($peminjamanBuku->count() > 0) {
+                $Peminjam = $peminjamanBuku->one();
+            } else if ($peminjamanKaset->count() > 0) {
+                $Peminjam = $peminjamanKaset->one();
+            }
+
+            if ($Peminjam != null) {
+                return $this->render('view_1', [
+                            'model' => $Peminjam,
+                ]);
+            } else {
+                return $this->render('kembali', [
+                            'model' => $model,
+                ]);
+            }
+        }
+
+        //   return $this->redirect(['kembali']);
+        else {
+            return $this->render('kembali', [
+                        'model' => $model,
+            ]);
+        }
+    }
+
+    public function actionPengembalian($id, $denda, $idBahanPustaka) {
+        $model = new Kembali();
+        $model->id_bahan_pustaka = $idBahanPustaka;
+        if ($model->Peminjaman()) {
+            if ($denda > 0) {
+                $dendas = new \common\models\DetailDenda();
+                $dendas->id_detail_peminjaman = $id;
+                $dendas->besar_denda = $denda;
+                $dendas->save();
+            }
+            Yii::$app->session->setFlash('success', 'Pengembalian Bahan Pustaka Berhasil!');
+            return $this->redirect(['kembali']);
+        } else {
+            return $this->render('index', [
+                        'model' => $model,
+            ]);
+        }
+    }
+
+    public function actionPinjamkan($id, $idRefKategori, $idBahanPustaka) {
+//        echo $id.$idBahanPustaka.$idRefKategori;
+        $peminjaman = new Peminjaman();
+        $buku2 = Pemesanan::find()->where(['id_d_buku' => $idBahanPustaka])->count();
+        $kaset2 = Pemesanan::find()->where(['id_d_kaset' => $idBahanPustaka])->count();
+        $buku = Pemesanan::find()->where(['id_d_buku' => $idBahanPustaka])->one();
+        $kaset = Pemesanan::find()->where(['id_d_kaset' => $idBahanPustaka])->one();
+//        die('ss');
+        if ($buku2 == 0 && $kaset2 == 0) {
+            Yii::$app->session->setFlash('danger', 'buku/kaset  tidak ditemukan');
+        } else {
+            if ($buku2 > 0) {
+                $peminjaman->id_referensi_kategori = $idRefKategori;
+                $buku = Pemesanan::findOne(['id_d_buku' => $idBahanPustaka,'acc2'=>NULL]);
+                $buku->id_status = 13;
+                $buku->tgl_pemeritahuan = date('Y-m-d H:m:s');
+                $buku->acc2 = Yii::$app->user->id;
+                $buku->save(false);
+            }
+            if ($kaset2 > 0) {
+                $peminjaman->id_referensi_kategori = $idRefKategori;
+                $kaset = Pemesanan::findOne(['id_d_kaset' => $idBahanPustaka,'acc2'=>NULL]);
+                $kaset->id_status = 13;
+                $kaset->tgl_ganti_status = date('Y-m-d H:m:s');
+                $kaset->acc2 = Yii::$app->user->id;
+                $kaset->save(false);
+            }
+            $pengguna = new Pengguna();
+            if ($pengguna->jabatan == "Mahasiswa") {
+                $peminjaman->rencana_kembali = date('Y-m-d', strtotime(date('Y-m-d') . '+7 days'));
+            } else {
+                $peminjaman->rencana_kembali = date('Y-m-d', strtotime(date('Y-m-d') . '+14 days'));
+            }
+            $peminjaman->id_referensi_kategori = $idRefKategori;
+            if ($buku2 > 0) {
+                $peminjaman->id_trans_peminjaman = $buku->id_trans_pemesanan;
+                $peminjaman->id_referensi_kategori = 1;
+                $peminjaman->id_d_buku = $idBahanPustaka;
+                $peminjaman->save();
+            } else if ($kaset2 > 0) {
+                $peminjaman->id_trans_peminjaman = $kaset->id_trans_pemesanan;
+                $peminjaman->id_referensi_kategori = 2;
+                $peminjaman->id_d_kaset = $idBahanPustaka;
+                $peminjaman->save();
+            }
+            $peminjaman->acc1 = Yii::$app->user->id;
+            $peminjaman->save();
+            Yii::$app->session->setFlash('success', 'Peminjaman Bahan Pustaka Berhasil!');
+            return $this->redirect(['pinjam']);
+        }
+    }
+
+    /**
+     * Deletes an existing PesanPinjam model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDelete($id) {
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Finds the PesanPinjam model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return PesanPinjam the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id) {
+        if (($model = PesanPinjam::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+
+}

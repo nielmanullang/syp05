@@ -1,0 +1,149 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+
+$this->title = 'Daftar Pemesanan';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<div class="loan-index">
+    <section class="content">
+        <div class="row">
+            <div class="box">
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#permohonanbuku" data-toggle="tab">Permohonan Buku</a></li>
+                        <li><a href="#permohonankaset" data-toggle="tab">Permohonan Kaset</a></li>
+                        <li><a href="#terimabuku" data-toggle="tab">Permintaan Buku</a></li>
+                        <li><a href="#terimakaset" data-toggle="tab">Permintaan Kaset</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="active tab-pane" id="permohonanbuku">
+                            <?=
+                            GridView::widget([
+                                'dataProvider' => $permohonanbuku,
+                                'columns' => [
+//                                    'id',
+//                                    'id_status',
+                                    'id_d_buku',
+//                                    'id_d_kaset',
+                                    [
+                                        'attribute' => 'Aksi',
+                                        'format' => 'raw',
+                                        'value' => function ($model) {
+                                            if ($model->id_status == '3') {
+                                                return '<div>' . Html::a('Setuju', [
+                                                            'approve', 'id' => $model->id], [
+                                                            'class' => 'btn btn-success']) . '&nbsp;'
+                                                        . Html::a('Tolak', [
+                                                            'reject', 'id' => $model->id], [
+//                                                            'return', 'copy_id' => $data->copy_id, 'id' => $data->id],
+                                                            'class' => 'btn btn btn-danger'])
+                                                        . '</div>';
+                                            } else if ($model->start_date != '0000-00-00' && $model->return_date != NULL) {
+                                                return "<div><span class='label label-default'>Returned</span></div>";
+                                            } else if ($model->start_date != '0000-00-00' && $model->return_date == NULL) {
+                                                return "<div><span class='label label-success'>Accepted</span></div>";
+                                            } else if ($model->start_date == '0000-00-00' && $model->return_date == '0000-00-00' && $model->due_date == '0000-00-00') {
+                                                return "<div><span class='label label-danger'>Rejected</span></div>";
+                                            }
+                                        },
+                                            ],
+                                        ],
+                                    ]);
+                                    ?>
+                                </div><!-- /.tab-pane -->
+                                <div class="tab-pane" id="permohonankaset">
+                                    <?=
+                                    GridView::widget([
+                                        'dataProvider' => $permohonankaset,
+                                        'columns' => [
+//                                    'id',
+//                                    'id_status',
+//                                            'id_d_buku',
+                                            'id_d_kaset',
+                                            [
+                                                'attribute' => 'Aksi',
+                                                'format' => 'raw',
+                                                'value' => function ($model) {
+                                                    if ($model->id_status == '3') {
+                                                        return '<div>' . Html::a('Setuju', [
+                                                                    'approve', 'id' => $model->id], [
+                                                                    'class' => 'btn btn-success']) . '&nbsp;'
+                                                                . Html::a('Tolak', [
+                                                                    'reject', 'id' => $model->id], [
+//                                                            'return', 'copy_id' => $data->copy_id, 'id' => $data->id],
+                                                                    'class' => 'btn btn btn-danger'])
+                                                                . '</div>';
+                                                    } else if ($model->start_date != '0000-00-00' && $model->return_date != NULL) {
+                                                        return "<div><span class='label label-default'>Returned</span></div>";
+                                                    } else if ($model->start_date != '0000-00-00' && $model->return_date == NULL) {
+                                                        return "<div><span class='label label-success'>Accepted</span></div>";
+                                                    } else if ($model->start_date == '0000-00-00' && $model->return_date == '0000-00-00' && $model->due_date == '0000-00-00') {
+                                                        return "<div><span class='label label-danger'>Rejected</span></div>";
+                                                    }
+                                                },
+                                                    ],
+                                                ],
+                                            ]);
+                                            ?>
+                                        </div><!-- /.tab-pane -->
+
+                                        <div class="tab-pane" id="terimabuku">
+                                            <?=
+                                            GridView::widget([
+                                                'dataProvider' => $terimabuku,
+                                                'columns' => [
+//                                            'id',
+//                                            'id_status',
+                                                    'id_d_buku',
+//                                                    'id_d_kaset',
+                                                    [
+                                                        'label' => 'Aksi',
+                                                        'format' => 'raw',
+                                                        'value' => function($model) {
+
+                                                            return '<div>' . Html::a('Batalkan', [
+                                                                        'return', 'id' => $model->id], [
+                                                                        'class' => 'btn btn btn-danger']) . '&nbsp;' . Html::a('Pinjamkan', ['pesan-pinjam/pinjamkan', 'id' => $model->id, 'idRefKategori' => $model->id_referensi_kategori, 'idBahanPustaka' => $model->id_d_buku], ['class' => 'btn btn-primary'])
+                                                                    . '</div>';
+                                                        }
+                                                            ],
+//            ['class' => 'yii\grid\AksiColumn'],
+                                                        ],
+                                                    ]);
+                                                    ?>
+                                                </div><!-- /.tab-pane -->
+                                                <div class="tab-pane" id="terimakaset">
+                                                    <?=
+                                                    GridView::widget([
+                                                        'dataProvider' => $terimakaset,
+                                                        'columns' => [
+//                                            'id',
+//                                            'id_status',
+//                                                            'id_d_buku',
+                                                            'id_d_kaset',
+                                                            [
+                                                                'label' => 'Aksi',
+                                                                'format' => 'raw',
+                                                                'value' => function($model) {
+
+                                                                    return '<div>' . Html::a('Batalkan', [
+                                                                                'return', 'id' => $model->id], [
+                                                                                'class' => 'btn btn btn-danger']) . '&nbsp;' . Html::a('Pinjamkan', ['pesan-pinjam/pinjamkan', 'id' => $model->id, 'idRefKategori' => $model->id_referensi_kategori, 'idBahanPustaka' => $model->id_d_kaset], ['class' => 'btn btn-primary'])
+                                                                            . '</div>';
+                                                                }
+                                                                    ],
+                                                                    
+//            ['class' => 'yii\grid\AksiColumn'],
+                                                                        ],
+                                                                    ]);
+                                                                    ?>
+
+                        </div><!-- /.tab-pane -->
+                    </div><!-- /.tab-content -->
+                </div><!-- /.nav-tabs-custom -->
+            </div>
+        </div>
+    </section> 
+</div>

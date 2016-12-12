@@ -1,0 +1,46 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+
+/* @var $this yii\web\View */
+/* @var $searchModel common\models\MasterKasetSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = 'Daftar Kaset';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<div class="kaset-index">
+
+    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+    <p>
+        <?= Html::a('Tambah Kaset', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+//            'id',
+            [
+                'attribute' => 'judul',
+                'format' => 'raw',
+                'value' => function($model) {
+                    return Html::a('' . $model->judul . '', ['master-kaset/view', 'id' => $model->id]);
+                }
+            ],
+//            'jumlah',
+            'keterangan:ntext',
+//            'jenis',
+            // 'gambar',
+             'subjek',
+            // 'prodi_pemilik',
+
+//            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+
+</div>

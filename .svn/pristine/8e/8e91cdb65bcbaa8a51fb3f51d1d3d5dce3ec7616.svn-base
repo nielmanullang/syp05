@@ -1,0 +1,26 @@
+<?php
+	use yii\helpers\Html;
+	
+?>
+
+<tr>
+	<td width="20px">
+      <div class="info-box bg-blue"> 
+        <div class="info-box-content">
+          <span class="info-box-text"><font style="color:#fff"><?= $model->tgl_mulai?></font></span>
+		  <i class="fa fa-user"></i> 
+          <span class="info-box-number"><font style="color:#fff">Oleh : <?= $model->id_pengguna?></font></span> 
+        </div><!-- /.info-box-content -->
+      </div><!-- /.info-box -->
+	</td>
+	<td style="padding-top: 0px; border-top-width: 0px; padding-bottom: 0px; padding-left: 0px; padding-right: 0px; padding-right: 0px;">
+		<div class="content" style="min-height: 300px ;padding-top: 0px;padding-left: 10px;padding-right: 10px;padding-bottom: 0px;">
+			<h1 style="margin-top: 8px;"><?= Html::a($model->judul, ['view','id' => $model->id])?></h1>
+			<div class="content-fill">
+				<p style="text-align:justify; font-size:18px; font-family:Calibri"><?=
+					substr(strip_tags($model->isi), 0, 290) ?>...</p>
+				<?= Html::a('Lihat Selengkapnya', ['view', 'id'=>$model->id], ['class' => 'btn btn-sm btn-primary']) ?>
+			</div>
+		</div>
+	</td>
+</tr>

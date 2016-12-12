@@ -1,0 +1,113 @@
+<?php
+
+namespace common\models;
+
+use Yii;
+use common\models\MasterBuku;
+
+/**
+ * This is the model class for table "t_d_buku".
+ *
+ * @property string $id_buku
+ * @property string $isbn
+ * @property string $klasifikasi
+ * @property string $lokasi
+ * @property string $cp_or
+ * @property string $tahun
+ * @property integer $id_master_buku
+ * @property integer $jenis
+ * @property integer $status
+ * @property string $tgl_masuk
+ * @property integer $availability
+ *
+ * @property TRJenis $jenis0
+ * @property TRJenis $status0
+ * @property TMBuku $idMasterBuku
+ * @property TDPemesanan[] $tDPemesanans
+ * @property TDPeminjaman[] $tDPeminjamen
+ */
+class DetailBuku extends \yii\db\ActiveRecord
+{
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return 't_d_buku';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['id_buku', 'id_master_buku'], 'required'],
+            [['cp_or'], 'string'],
+            [['id_master_buku', 'jenis', 'status', 'availability'], 'integer'],
+            [['tgl_masuk'], 'safe'],
+            [['id_buku', 'isbn', 'klasifikasi', 'lokasi', 'tahun'], 'string', 'max' => 45],
+            [['id_buku'], 'unique'],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id_buku' => 'Id Buku',
+            'isbn' => 'Isbn',
+            'klasifikasi' => 'Klasifikasi',
+            'lokasi' => 'Lokasi',
+            'cp_or' => 'Cp Or',
+            'tahun' => 'Tahun',
+            'id_master_buku' => 'Id Master Buku',
+            'jenis' => 'Jenis',
+            'status' => 'Status',
+            'tgl_masuk' => 'Tgl Masuk',
+            'availability' => 'Availability',
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getJenis0()
+    {
+        return $this->hasOne(TRJenis::className(), ['id' => 'jenis']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStatus0()
+    {
+        return $this->hasOne(TRJenis::className(), ['id' => 'status']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getIdMasterBuku()
+    {
+        return $this->hasOne(MasterBuku::className(), ['id' => 'id_master_buku']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTDPemesanans()
+    {
+        return $this->hasMany(TDPemesanan::className(), ['id_d_buku' => 'id_buku']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTDPeminjamen()
+    {
+        return $this->hasMany(TDPeminjaman::className(), ['id_d_buku' => 'id_buku']);
+    }
+}

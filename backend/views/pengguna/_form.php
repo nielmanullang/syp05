@@ -1,0 +1,41 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+
+/* @var $this yii\web\View */
+/* @var $model common\models\Pengguna */
+/* @var $form yii\widgets\ActiveForm */
+?>
+
+<div class="pengguna-form">
+
+    <?php $form = ActiveForm::begin(); ?>
+
+    <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'batas_buku')->textInput() ?>
+
+    <?= $form->field($model, 'status')->dropDownList(['1' => 'Aktif', '2' => 'Pasif'], ['prompt' => 'Pilih Status']) ?>
+
+    <?= $form->field($model, 'NI')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'nama')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'alamat')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'no_hp')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'jabatan')->dropDownList(['Admin' => 'Admin', 'Staff' => 'Staff', 'Dosen' => 'Dosen', 'Asisten Dosen' => 'Asisten Dosen', 'Mahasiswa' => 'Mahasiswa', 'Siswa SMA' => 'Siswa SMA'], ['prompt' => 'Pilih Jabatan']) ?>
+
+    <?= $form->field($model, 'jurusan')->dropDownList([ 'D3 Teknik Informatika' => 'D3 Teknik Informatika', 'D3 Teknik Komputer' => 'D3 Teknik Komputer', 'D4 Teknik Informatika' => 'D4 Teknik Informatika', 'S1 Teknik Informatika' => 'S1 Teknik Informatika', 'S1 Sistem Informasi' => 'S1 Sistem Informasi', 'S1 Teknik Elektro' => 'S1 Teknik Elektro', 'S1 Teknik Bio.Proses' => 'S1 Teknik Bio.Proses', 'S1 Teknik Manajemen Rekayasa' => 'S1 Teknik Manajemen Rekayasa', ], ['prompt' => '']) ?>
+
+    <div class="form-group">
+        <?= Html::submitButton($model->isNewRecord ? 'Tambah' : 'Edit', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+    </div>
+
+    <?php ActiveForm::end(); ?>
+
+</div>

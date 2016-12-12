@@ -1,0 +1,44 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ListView;
+use frontend\assets\AppAsset;
+use miloschuman\highcharts\Highcharts;
+/* @var $this yii\web\View */
+/* @var $searchModel common\models\ArtikelSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = 'Artikel';
+//$this->params['breadcrumbs'][] = $this->title;
+
+//$asset = frontend\assets\AppAsset::register($this);
+//$baseUrl = $asset->baseUrl;
+?>
+
+<html lang="en">
+<body>
+<section id="blog" class="container">
+        <div class="blog">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="blog-item">
+                        <table class="table responsive">
+                            <div class="row">                             
+                                        <tbody>
+                                            <?= ListView::widget([
+                                            'dataProvider' => $dataProvider,
+                                            'itemView' => '_view1',
+                                            'summary' => '',
+                                        ]); ?>
+                                        </tbody>
+                            </div>
+                        </table>
+                    </div>
+                </div><!--/.col-md-8--> 
+            </div><!--/.row-->
+        </div>
+    </section><!--/#blog-->
+</body>
+
+</html>
+ 

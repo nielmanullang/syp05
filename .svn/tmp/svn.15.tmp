@@ -1,0 +1,49 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+
+/* @var $this yii\web\View */
+/* @var $searchModel common\models\MasterBukuSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = 'Daftar Buku';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<div class="buku-index">
+
+    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+    <p>
+        <?= Html::a('Tambah Buku', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?=
+    GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            // 'id',
+            // 'edisi',
+            [
+                'attribute' => 'judul',
+                'format' => 'raw',
+                'value' => function($model) {
+                    return Html::a('' . $model->judul . '', ['master-buku/view', 'id' => $model->id]);
+                }
+            ],
+                    'pengarang',
+                    // 'deskripsi:ntext',
+                    'penerbit',
+                    // 'jumlah_buku',
+                    // 'bahasa',
+                    // 'gambar',
+//                    'subjek',
+                    // 'topik',
+                    ['class' => 'yii\grid\ActionColumn'],
+                ],
+            ]);
+            ?>
+
+</div>

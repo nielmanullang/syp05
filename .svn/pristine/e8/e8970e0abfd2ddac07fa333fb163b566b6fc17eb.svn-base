@@ -1,0 +1,58 @@
+<?php
+/* @var $this yii\web\View */
+
+use yii\grid\GridView;
+use yii\widgets\ListView;
+use yii\helpers\Html;
+
+//$this->title = 'Online Library Information System';
+//
+//$this->params['breadcrumbs'][] = $this->title;
+?>
+
+<div class="site-index">
+    <div class="col-md-7">
+        <div class="testimonial" style="padding-left:30px" >
+            <h1 align="center"><br>Pengumuman </h1>
+            <div class="media-body">                
+                <?=
+                                            ListView::widget([
+                                                'dataProvider' => $dataProvider,
+                                                'itemView' => '_view1',
+                                                'summary' => '',
+                                            ]);
+                  ?>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <h2 align="left" style="padding-left:15px"><br>Buku Terbaru </h2>
+		<div class="testimonial">
+        <?=
+                                            ListView::widget([
+                                                'dataProvider' => $dataProviderBuku,
+                                                'itemView' => '_view2',
+                                                'summary' => '',
+                                            ]);
+                  ?>
+        </div>
+    </div>
+    <br><br>
+    <div class="col-md-4 panel" style="margin-top: 20px;"> 
+            <h4 style="color:#fff"><b><div class="featured_slider horizontal-slide clearfix">Jam Buka Perpustakaan:</div></b></h4>
+            Masa Reguler:<br>
+            Senin-Jumat : 08.00 - 21.30<br>
+            Sabtu : 08.00 - 11.00 ; 13.00 - 19.00<br>
+            Minggu : Libur
+            <br><br> 
+            Masa Libur Semester:<br>
+            Senin-Jumat : 08.00 - 16.30<br>
+            Sabtu : 08.00 - 11.00 ; 13.00 - 16.30<br>
+            Minggu : Libur
+            <br><br>
+            Alamat:<br>
+            Institut Teknologi Del<br>
+            Jl. Sisingamangaraja Desa Sitoluama Kecamatan Laguboti<br>
+            Toba Samosir 22381<br>
+        </div>
+</div>

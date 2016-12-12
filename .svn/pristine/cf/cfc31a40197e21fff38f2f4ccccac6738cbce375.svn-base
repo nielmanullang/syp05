@@ -1,0 +1,137 @@
+<?php
+
+namespace backend\controllers;
+
+use Yii;
+use common\models\Peminjaman;
+use common\models\PeminjamanSearch;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
+use common\models\Pengguna;
+use yii\data\ActiveDataProvider;
+use common\models\PesanPinjam;
+use common\models\PesanPinjamSearch;
+
+/**
+ * PeminjamanController implements the CRUD actions for Peminjaman model.
+ */
+class PeminjamanController extends Controller {
+
+    public function behaviors() {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Lists all Peminjaman models.
+     * @return mixed
+     */
+    public function actionIndex() {
+        $id = Yii::$app->user->id;
+        $pengguna = Pengguna::findOne(['id' => $id]);
+        $searchModel = new PesanPinjamSearch();
+        $dataProvider = new \yii\data\SqlDataProvider([
+            'sql' => "SELECT rencana_kembali AS 'Batas_Pengembalian', 
+                    (SELECT jenis_kategori FROM t_kategori_denda WHERE id = id_referensi_kategori) AS 'Kategori',
+                    tgl_transaksi AS 'Waktu_Peminjaman',
+                    id_d_buku AS 'ID_Bahan_Pustaka'
+                    FROM t_d_peminjaman, t_t_pesan_pinjam
+                    WHERE  t_d_peminjaman.`id_trans_peminjaman` = t_t_pesan_pinjam.`id` 
+                    AND tgl_kembali IS NULL AND id_referensi_kategori = 1
+                    UNION
+                    SELECT rencana_kembali AS 'Batas_Pengembalian', 
+                    (SELECT jenis_kategori FROM t_kategori_denda WHERE id = id_referensi_kategori) AS 'Kategori', 
+                    tgl_transaksi AS 'Waktu Peminjaman',
+                    id_d_kaset AS 'ID_Bahan_Pustaka'
+                    FROM t_d_peminjaman JOIN t_t_pesan_pinjam
+                    ON  t_d_peminjaman.`id_trans_peminjaman` = t_t_pesan_pinjam.`id`
+                    WHERE id_referensi_kategori = 2 AND tgl_kembali IS NULL and id_pengguna = " . Yii::$app->user->id
+        ]);
+
+        return $this->render('index', [
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Displays a single Peminjaman model.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionView($id) {
+        return $this->render('view', [
+                    'model' => $this->findModel($id),
+        ]);
+    }
+
+    /**
+     * Creates a new Peminjaman model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+   * @return mixed
+     */
+    public function actionCreate() {
+        $model = new Peminjaman();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('create', [
+                        'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Updates an existing Peminjaman model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUpdate($id) {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('update', [
+                        'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Deletes an existing Peminjaman model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDelete($id) {
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Finds the Peminjaman model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Peminjaman the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id) {
+        if (($model = Peminjaman::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+
+}

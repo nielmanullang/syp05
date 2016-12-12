@@ -1,0 +1,80 @@
+<?php
+
+namespace common\models;
+
+use Yii;
+
+/**
+ * This is the model class for table "t_m_buku".
+ *
+ * @property integer $id
+ * @property string $edisi
+ * @property string $pengarang
+ * @property string $deskripsi
+ * @property string $penerbit
+ * @property string $judul
+ * @property integer $jumlah_buku
+ * @property string $bahasa
+ * @property string $gambar
+ * @property string $subjek
+ * @property string $topik
+ *
+ * @property TDBuku[] $tDBukus
+ */
+class MasterBuku extends \yii\db\ActiveRecord
+{
+    /**
+     * @inheritdoc
+     */
+    public $file;
+    public static function tableName()
+    {
+        return 't_m_buku';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['id', 'edisi', 'pengarang', 'deskripsi', 'penerbit', 'judul', 'jumlah_buku'], 'required'],
+            [['deskripsi'], 'string'],
+            [['jumlah_buku'], 'integer'],
+            [['edisi', 'pengarang', 'penerbit', 'gambar'], 'string', 'max' => 45],
+            [['judul'], 'string', 'max' => 255],
+            [['bahasa'], 'string', 'max' => 15],
+            [['subjek', 'topik'], 'string', 'max' => 125],
+            [['file'],'file']
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'Id Master Buku',
+            'edisi' => 'Edisi',
+            'pengarang' => 'Pengarang',
+            'deskripsi' => 'Deskripsi',
+            'penerbit' => 'Penerbit',
+            'judul' => 'Judul',
+            'jumlah_buku' => 'Jumlah Buku',
+            'bahasa' => 'Bahasa',
+            'gambar' => 'Gambar',
+            'subjek' => 'Subjek',
+            'topik' => 'Topik',
+            'file'=> 'Gambar',
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTDBukus()
+    {
+        return $this->hasMany(TDBuku::className(), ['id_master_buku' => 'id']);
+    }
+}

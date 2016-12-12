@@ -1,0 +1,24 @@
+<?php
+
+use yii\helpers\Html;
+?>
+
+
+<div class="col-md-12">
+  <div class="featured_slider horizontal-slide clearfix">
+	<div class="time" style="color:#fff">
+	    <?= $model->tgl_mulai ?>
+	</div>
+	<h3 style="margin-top: 5px;">
+	    <p><a href="?r=master-pengumuman%2Fview&id=<?= $model->id?>" style="color:#fff"><?= $model->judul ?></a></p>
+	</h3>
+	<div class="meta" style="color:#fff" >
+	    by
+	    <?= $model->id_pengguna ?>
+	</div>
+  </div>
+	<p style="background-color:rgba(255, 255, 255, 0.65);">
+	<?=substr(strip_tags($model->isi), 0, 250) ?>...
+	    <a class="more-link" href="single-blog.html"><a href="?r=master-pengumuman%2Fview&id=<?= $model->id ?>"><br>Read more</a></a>
+	</p><hr style="size:2px">
+</div>

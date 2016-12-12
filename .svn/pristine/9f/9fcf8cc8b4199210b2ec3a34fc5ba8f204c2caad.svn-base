@@ -1,0 +1,19 @@
+<?php
+
+use yii\helpers\Html;
+
+/* @var $this yii\web\View */
+/* @var $model common\models\MasterBuku */
+
+$this->title = 'Update Buku: ' . ' ' . $model->judul;
+$this->params['breadcrumbs'][] = ['label' => 'Master Buku', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = 'Update';
+?>
+<div class="buku-update">
+
+    <?= $this->render('_form', [
+        'model' => $model,
+    ]) ?>
+
+</div>
